@@ -7,14 +7,35 @@ import Footer from '@/components/footer'
 import { SignUpButton } from '@clerk/nextjs'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { useRef, useState, useEffect } from 'react'
 
 export default function LandingPage() {
+  const heroRef = useRef<HTMLDivElement>(null)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (heroRef.current) {
+        const rect = heroRef.current.getBoundingClientRect()
+        const x = e.clientX - rect.left
+        const y = e.clientY - rect.top
+        setMousePosition({ x, y })
+      }
+    }
+
+    const heroElement = heroRef.current
+    if (heroElement) {
+      heroElement.addEventListener('mousemove', handleMouseMove)
+      return () => heroElement.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [])
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden px-4 py-20 sm:py-32">
+      <section ref={heroRef} className="relative overflow-hidden px-4 py-20 sm:py-32">
         <div className="absolute inset-0 -z-10 opacity-40">
           <motion.div 
             className="absolute top-20 right-0 w-80 h-80 bg-accent rounded-full mix-blend-multiply filter blur-3xl"
@@ -41,19 +62,43 @@ export default function LandingPage() {
               delay: 1
             }}
           />
+          {/* Mouse tracking glow effect */}
+          <motion.div 
+            className="absolute w-96 h-96 bg-accent/30 rounded-full mix-blend-screen filter blur-2xl pointer-events-none"
+            animate={{
+              x: mousePosition.x - 192,
+              y: mousePosition.y - 192,
+            }}
+            transition={{
+              type: "spring",
+              damping: 30,
+              stiffness: 200,
+            }}
+          />
         </div>
 
         <div className="mx-auto max-w-4xl text-center">
           <motion.div 
             className="mb-6 inline-block"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            initial={{ opacity: 0, y: -20, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+            whileHover={{ scale: 1.05, y: -5 }}
           >
-            <span className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-2 text-sm font-medium text-accent border border-accent/20">
+            <motion.span 
+              className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-2 text-sm font-medium text-accent border border-accent/20"
+              animate={{ 
+                boxShadow: [
+                  "0 0 0px rgba(var(--accent), 0)",
+                  "0 0 20px rgba(var(--accent), 0.5)",
+                  "0 0 0px rgba(var(--accent), 0)"
+                ]
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
               <Sparkles className="w-4 h-4" />
               AI-Powered Outreach
-            </span>
+            </motion.span>
           </motion.div>
 
           <motion.h1 
@@ -62,7 +107,17 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            Transform URLs into <span className="text-accent">personalized emails</span> in 30 seconds
+            Transform URLs into{' '}
+            <motion.span 
+              className="text-accent inline-block"
+              animate={{ 
+                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              personalized emails
+            </motion.span>{' '}
+            in 30 seconds
           </motion.h1>
 
           <motion.p 
@@ -71,7 +126,15 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Our intelligent agent scrapes company data, analyzes recent news, and generates hyper-personalized outreach emails. Perfect for sales teams, recruiters, and business development professionals.
+            Our intelligent agent{' '}
+            <motion.span
+              className="font-semibold text-accent"
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0 }}
+            >
+              scrapes company data
+            </motion.span>
+            , analyzes recent news, and generates hyper-personalized outreach emails. Perfect for sales teams, recruiters, and business development professionals.
           </motion.p>
 
           <motion.div 
@@ -80,16 +143,20 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <SignUpButton mode="redirect">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-white gap-2 h-12 px-8 text-base">
-                Try Demo <ArrowRight className="w-4 h-4" />
-              </Button>
-            </SignUpButton>
-            <Link href="#features">
-              <Button size="lg" variant="outline" className="gap-2 h-12 px-8 text-base bg-transparent">
-                View Features
-              </Button>
-            </Link>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <SignUpButton mode="redirect">
+                <Button size="lg" className="bg-accent hover:bg-accent/90 text-white gap-2 h-12 px-8 text-base">
+                  Try Demo <ArrowRight className="w-4 h-4" />
+                </Button>
+              </SignUpButton>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link href="#features">
+                <Button size="lg" variant="outline" className="gap-2 h-12 px-8 text-base bg-transparent">
+                  View Features
+                </Button>
+              </Link>
+            </motion.div>
           </motion.div>
 
           <motion.div 
@@ -98,18 +165,28 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <div>
-              <div className="text-2xl font-bold text-accent">30s</div>
-              <p className="text-sm text-foreground/60">Complete Analysis</p>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-accent">99%</div>
-              <p className="text-sm text-foreground/60">Personalization Rate</p>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-accent">∞</div>
-              <p className="text-sm text-foreground/60">Research Saved</p>
-            </div>
+            {[
+              { value: '30s', label: 'Complete Analysis' },
+              { value: '99%', label: 'Personalization Rate' },
+              { value: '∞', label: 'Research Saved' }
+            ].map((stat, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5 + idx * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <motion.div 
+                  className="text-2xl font-bold text-accent"
+                  animate={{ y: [0, -5, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, delay: idx * 0.2 }}
+                >
+                  {stat.value}
+                </motion.div>
+                <p className="text-sm text-foreground/60">{stat.label}</p>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </section>
