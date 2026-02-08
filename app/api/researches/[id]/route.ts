@@ -13,12 +13,25 @@ export async function GET(
 ) {
   try {
     // Get authenticated user
-    const { userId } = await import('@clerk/nextjs/server').then(m => m.auth())
+    const { userId: clerkUserId } = await import('@clerk/nextjs/server').then(m => m.auth())
     
-    if (!userId) {
+    if (!clerkUserId) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized. Please sign in.' },
         { status: 401 }
+      )
+    }
+
+    // Get Prisma user ID from Clerk user ID
+    const user = await prisma.user.findUnique({
+      where: { clerkId: clerkUserId },
+      select: { id: true },
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'User not found in database' },
+        { status: 404 }
       )
     }
 
@@ -38,7 +51,7 @@ export async function GET(
     }
 
     // Check ownership
-    if (research.userId !== userId) {
+    if (research.userId !== user.id) {
       return NextResponse.json(
         { success: false, error: 'Forbidden. You do not own this research.' },
         { status: 403 }
@@ -74,12 +87,25 @@ export async function PATCH(
 ) {
   try {
     // Get authenticated user
-    const { userId } = await import('@clerk/nextjs/server').then(m => m.auth())
+    const { userId: clerkUserId } = await import('@clerk/nextjs/server').then(m => m.auth())
     
-    if (!userId) {
+    if (!clerkUserId) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized. Please sign in.' },
         { status: 401 }
+      )
+    }
+
+    // Get Prisma user ID from Clerk user ID
+    const user = await prisma.user.findUnique({
+      where: { clerkId: clerkUserId },
+      select: { id: true },
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'User not found in database' },
+        { status: 404 }
       )
     }
 
@@ -117,7 +143,7 @@ export async function PATCH(
     }
 
     // Check ownership
-    if (existingResearch.userId !== userId) {
+    if (existingResearch.userId !== user.id) {
       return NextResponse.json(
         { success: false, error: 'Forbidden. You do not own this research.' },
         { status: 403 }
@@ -159,12 +185,25 @@ export async function DELETE(
 ) {
   try {
     // Get authenticated user
-    const { userId } = await import('@clerk/nextjs/server').then(m => m.auth())
+    const { userId: clerkUserId } = await import('@clerk/nextjs/server').then(m => m.auth())
     
-    if (!userId) {
+    if (!clerkUserId) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized. Please sign in.' },
         { status: 401 }
+      )
+    }
+
+    // Get Prisma user ID from Clerk user ID
+    const user = await prisma.user.findUnique({
+      where: { clerkId: clerkUserId },
+      select: { id: true },
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'User not found in database' },
+        { status: 404 }
       )
     }
 
@@ -183,7 +222,7 @@ export async function DELETE(
     }
 
     // Check ownership
-    if (existingResearch.userId !== userId) {
+    if (existingResearch.userId !== user.id) {
       return NextResponse.json(
         { success: false, error: 'Forbidden. You do not own this research.' },
         { status: 403 }

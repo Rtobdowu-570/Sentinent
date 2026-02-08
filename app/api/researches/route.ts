@@ -13,7 +13,7 @@ import { Prisma } from '@prisma/client'
  * 
  * Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.7, 8.6
  */
-export const POST = withAuth(async (userId: string, request: Request) => {
+export const POST = withAuth(async (clerkUserId: string, request: Request) => {
   try {
     const body = await request.json()
     const { companyUrl } = body
@@ -26,8 +26,8 @@ export const POST = withAuth(async (userId: string, request: Request) => {
       )
     }
 
-    // Check rate limits
-    const rateLimitResult = await rateLimitService.checkLimit(userId)
+    // Check rate limits (this also ensures user exists in database)
+    const rateLimitResult = await rateLimitService.checkLimit(clerkUserId)
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         {
@@ -96,13 +96,29 @@ export const POST = withAuth(async (userId: string, request: Request) => {
       )
     }
 
-    // Step 6 & 7: Save research and increment usage in a transaction
+    // Step 6: Get Prisma user ID from Clerk user ID
+    const user = await prisma.user.findUnique({
+      where: { clerkId: clerkUserId },
+      select: { id: true },
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'User not found in database',
+        },
+        { status: 404 }
+      )
+    }
+
+    // Step 7 & 8: Save research and increment usage in a transaction
     // This ensures atomicity - either both operations succeed or both fail
     const research = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Create research
       const newResearch = await tx.research.create({
         data: {
-          userId,
+          userId: user.id,
           companyUrl,
           companyName: scrapedData.companyName,
           scrapedData: scrapedData as any,
@@ -117,7 +133,7 @@ export const POST = withAuth(async (userId: string, request: Request) => {
 
       // Increment usage counter
       const subscription = await tx.subscription.findUnique({
-        where: { userId },
+        where: { userId: user.id },
       })
 
       if (!subscription) {
@@ -125,7 +141,7 @@ export const POST = withAuth(async (userId: string, request: Request) => {
       }
 
       await tx.subscription.update({
-        where: { userId },
+        where: { userId: user.id },
         data: {
           monthlyUsage: subscription.monthlyUsage + 1,
         },
@@ -161,12 +177,25 @@ export const POST = withAuth(async (userId: string, request: Request) => {
 export async function GET(request: NextRequest) {
   try {
     // Get authenticated user
-    const { userId } = await import('@clerk/nextjs/server').then(m => m.auth())
+    const { userId: clerkUserId } = await import('@clerk/nextjs/server').then(m => m.auth())
     
-    if (!userId) {
+    if (!clerkUserId) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized. Please sign in.' },
         { status: 401 }
+      )
+    }
+
+    // Get Prisma user ID from Clerk user ID
+    const user = await prisma.user.findUnique({
+      where: { clerkId: clerkUserId },
+      select: { id: true },
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'User not found in database' },
+        { status: 404 }
       )
     }
 
@@ -179,7 +208,7 @@ export async function GET(request: NextRequest) {
     const tag = searchParams.get('tag') || ''
 
     // Build where clause
-    const where: any = { userId }
+    const where: any = { userId: user.id }
 
     // Add search filter
     if (search) {

@@ -8,16 +8,32 @@ import { prisma } from '@/lib/prisma'
  * 
  * Requirements: 9.1, 9.2, 9.3, 9.4, 9.5
  */
-export const GET = withAuth(async (userId: string) => {
+export const GET = withAuth(async (clerkUserId: string) => {
   try {
+    // Get Prisma user ID from Clerk user ID
+    const user = await prisma.user.findUnique({
+      where: { clerkId: clerkUserId },
+      select: { id: true },
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'User not found in database',
+        },
+        { status: 404 }
+      )
+    }
+
     // Calculate total research count (Requirement 9.1)
     const totalResearches = await prisma.research.count({
-      where: { userId },
+      where: { userId: user.id },
     })
 
     // Get subscription data for usage and limit (Requirements 9.2)
     let subscription = await prisma.subscription.findUnique({
-      where: { userId },
+      where: { userId: user.id },
     })
 
     // If no subscription exists, create a default free tier subscription
@@ -29,7 +45,7 @@ export const GET = withAuth(async (userId: string) => {
 
       subscription = await prisma.subscription.create({
         data: {
-          userId,
+          userId: user.id,
           plan: 'free',
           monthlyUsage: 0,
           monthlyLimit: 5,
@@ -41,7 +57,7 @@ export const GET = withAuth(async (userId: string) => {
     // Count favorites (Requirement 9.4)
     const favoritesCount = await prisma.research.count({
       where: {
-        userId,
+        userId: user.id,
         isFavorite: true,
       },
     })
@@ -53,7 +69,7 @@ export const GET = withAuth(async (userId: string) => {
 
     // Fetch recent research entries (Requirement 9.3)
     const recentResearches = await prisma.research.findMany({
-      where: { userId },
+      where: { userId: user.id },
       orderBy: { generatedAt: 'desc' },
       take: 5,
       select: {
