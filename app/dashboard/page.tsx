@@ -26,17 +26,41 @@ interface UserStats {
 
 async function getUserStats(userId: string): Promise<UserStats | null> {
   try {
-    // Import prisma dynamically to avoid issues
+    // Import prisma and clerk dynamically
     const { prisma } = await import('@/lib/prisma')
+    const { clerkClient } = await import('@clerk/nextjs/server')
+    
+    // Ensure user exists in database (create if doesn't exist)
+    let user = await prisma.user.findUnique({
+      where: { clerkId: userId },
+    })
+
+    if (!user) {
+      // Get user info from Clerk
+      const clerk = await clerkClient()
+      const clerkUser = await clerk.users.getUser(userId)
+      
+      // Create user in database
+      user = await prisma.user.create({
+        data: {
+          clerkId: userId,
+          email: clerkUser.emailAddresses[0]?.emailAddress || '',
+          name: clerkUser.firstName && clerkUser.lastName 
+            ? `${clerkUser.firstName} ${clerkUser.lastName}`
+            : clerkUser.username || null,
+          imageUrl: clerkUser.imageUrl || null,
+        },
+      })
+    }
     
     // Calculate total research count
     const totalResearches = await prisma.research.count({
-      where: { userId },
+      where: { userId: user.id },
     })
 
     // Get subscription data for usage and limit
     let subscription = await prisma.subscription.findUnique({
-      where: { userId },
+      where: { userId: user.id },
     })
 
     // If no subscription exists, create a default free tier subscription
@@ -48,7 +72,7 @@ async function getUserStats(userId: string): Promise<UserStats | null> {
 
       subscription = await prisma.subscription.create({
         data: {
-          userId,
+          userId: user.id,
           plan: 'free',
           monthlyUsage: 0,
           monthlyLimit: 5,
@@ -60,7 +84,7 @@ async function getUserStats(userId: string): Promise<UserStats | null> {
     // Count favorites
     const favoritesCount = await prisma.research.count({
       where: {
-        userId,
+        userId: user.id,
         isFavorite: true,
       },
     })
@@ -72,7 +96,7 @@ async function getUserStats(userId: string): Promise<UserStats | null> {
 
     // Fetch recent research entries
     const recentResearches = await prisma.research.findMany({
-      where: { userId },
+      where: { userId: user.id },
       orderBy: { generatedAt: 'desc' },
       take: 5,
       select: {
