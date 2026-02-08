@@ -19,7 +19,9 @@ export class EmailGenerationService {
     }
 
     this.genAI = new GoogleGenerativeAI(apiKey)
-    this.model = this.genAI.getGenerativeModel({ model: 'gemini-pro' })
+    // Use gemini-1.5-flash for faster, cost-effective generation
+    // Alternative: 'gemini-1.5-pro' for more advanced capabilities
+    this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
   }
 
   /**
