@@ -30,28 +30,30 @@ async function getUserStats(userId: string): Promise<UserStats | null> {
     const { prisma } = await import('@/lib/prisma')
     const { clerkClient } = await import('@clerk/nextjs/server')
     
-    // Ensure user exists in database (create if doesn't exist)
-    let user = await prisma.user.findUnique({
+    // Get user info from Clerk
+    const clerk = await clerkClient()
+    const clerkUser = await clerk.users.getUser(userId)
+    
+    // Ensure user exists in database (upsert to handle race conditions)
+    const user = await prisma.user.upsert({
       where: { clerkId: userId },
+      update: {
+        // Update user info in case it changed in Clerk
+        email: clerkUser.emailAddresses[0]?.emailAddress || '',
+        name: clerkUser.firstName && clerkUser.lastName 
+          ? `${clerkUser.firstName} ${clerkUser.lastName}`
+          : clerkUser.username || null,
+        imageUrl: clerkUser.imageUrl || null,
+      },
+      create: {
+        clerkId: userId,
+        email: clerkUser.emailAddresses[0]?.emailAddress || '',
+        name: clerkUser.firstName && clerkUser.lastName 
+          ? `${clerkUser.firstName} ${clerkUser.lastName}`
+          : clerkUser.username || null,
+        imageUrl: clerkUser.imageUrl || null,
+      },
     })
-
-    if (!user) {
-      // Get user info from Clerk
-      const clerk = await clerkClient()
-      const clerkUser = await clerk.users.getUser(userId)
-      
-      // Create user in database
-      user = await prisma.user.create({
-        data: {
-          clerkId: userId,
-          email: clerkUser.emailAddresses[0]?.emailAddress || '',
-          name: clerkUser.firstName && clerkUser.lastName 
-            ? `${clerkUser.firstName} ${clerkUser.lastName}`
-            : clerkUser.username || null,
-          imageUrl: clerkUser.imageUrl || null,
-        },
-      })
-    }
     
     // Calculate total research count
     const totalResearches = await prisma.research.count({
