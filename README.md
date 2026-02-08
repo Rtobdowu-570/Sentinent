@@ -2,6 +2,12 @@
 
 An AI-powered application that transforms company URLs into hyper-personalized outreach emails within 30 seconds. The system combines intelligent web scraping, news analysis, LinkedIn integration, and AI-powered email generation.
 
+## 🚀 Quick Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+**Ready to deploy?** See [VERCEL-QUICK-START.md](./VERCEL-QUICK-START.md) for a 5-minute deployment guide!
+
 ## Features
 
 - 🔐 Secure authentication with Clerk (Email, Google, GitHub)
@@ -181,16 +187,20 @@ All 39 correctness properties are implemented as property tests, ensuring compre
 
 ### Vercel (Recommended)
 
+For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
+
+Quick steps:
 1. Push your code to GitHub
 2. Import the project in Vercel
 3. Add environment variables in Vercel dashboard
-4. Deploy
+4. Set up database schema with `npx prisma db push`
+5. Deploy
 
 ### Other Platforms
 
 Ensure you:
 1. Set all environment variables
-2. Run database migrations
+2. Run database migrations: `npx prisma db push`
 3. Build the project: `pnpm build`
 4. Start the server: `pnpm start`
 
