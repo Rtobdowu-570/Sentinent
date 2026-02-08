@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String?
+  clerkId       String         @unique
+  imageUrl      String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  researches    Research[]
+  subscription  Subscription?
+}
+
+model Research {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyUrl      String
+  companyName     String
+  scrapedData     Json
+  newsArticles    Json
+  linkedinData    Json?
+  emailSubject    String
+  emailBody       String    @db.Text
+  insights        Json
+  status          String    @default("completed")
+  generatedAt     DateTime  @default(now())
+  isFavorite      Boolean   @default(false)
+  tags            String[]
+  
+  @@index([userId])
+  @@index([generatedAt])
+  @@index([isFavorite])
+}
+
+model Subscription {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan            String    @default("free")
+  monthlyUsage    Int       @default(0)
+  monthlyLimit    Int       @default(5)
+  resetDate       DateTime
+  stripeCustomerId String?
+  stripeSubscriptionId String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
