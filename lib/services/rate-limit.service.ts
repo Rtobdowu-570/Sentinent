@@ -29,26 +29,29 @@ const PLAN_LIMITS: Record<string, number> = {
 export class RateLimitService {
   /**
    * Check if user has remaining quota for the current month
-   * Creates subscription record if it doesn't exist
+   * Creates user and subscription record if they don't exist
    * 
-   * @param userId - The user's ID
+   * @param clerkUserId - The Clerk user's ID
    * @returns RateLimitResult with allowed status and usage info
    */
-  async checkLimit(userId: string): Promise<RateLimitResult> {
+  async checkLimit(clerkUserId: string): Promise<RateLimitResult> {
+    // Ensure user exists in database first
+    const user = await this.ensureUserExists(clerkUserId)
+    
     // Get or create subscription
     let subscription = await prisma.subscription.findUnique({
-      where: { userId },
+      where: { userId: user.id },
     })
 
     // Create subscription if it doesn't exist
     if (!subscription) {
-      subscription = await this.createSubscription(userId)
+      subscription = await this.createSubscription(user.id)
     }
 
     // Check if we need to reset monthly usage
     const now = new Date()
     if (now >= subscription.resetDate) {
-      subscription = await this.resetMonthlyUsage(userId)
+      subscription = await this.resetMonthlyUsage(user.id)
     }
 
     const allowed = subscription.monthlyUsage < subscription.monthlyLimit
@@ -64,16 +67,63 @@ export class RateLimitService {
   }
 
   /**
+   * Ensure user exists in database, create if doesn't exist
+   * 
+   * @param clerkUserId - The Clerk user's ID
+   * @returns User record
+   */
+  private async ensureUserExists(clerkUserId: string) {
+    const { clerkClient } = await import('@clerk/nextjs/server')
+    
+    // Try to find user by clerkId
+    let user = await prisma.user.findUnique({
+      where: { clerkId: clerkUserId },
+    })
+
+    if (!user) {
+      // Get user info from Clerk
+      const clerk = await clerkClient()
+      const clerkUser = await clerk.users.getUser(clerkUserId)
+      
+      // Create user using upsert to handle race conditions
+      user = await prisma.user.upsert({
+        where: { clerkId: clerkUserId },
+        update: {},
+        create: {
+          clerkId: clerkUserId,
+          email: clerkUser.emailAddresses[0]?.emailAddress || '',
+          name: clerkUser.firstName && clerkUser.lastName 
+            ? `${clerkUser.firstName} ${clerkUser.lastName}`
+            : clerkUser.username || null,
+          imageUrl: clerkUser.imageUrl || null,
+        },
+      })
+    }
+
+    return user
+  }
+
+  /**
    * Increment user's monthly usage counter
    * Should be called after successful research creation
    * 
-   * @param userId - The user's ID
+   * @param clerkUserId - The Clerk user's ID
    * @throws Error if subscription not found
    */
-  async incrementUsage(userId: string): Promise<void> {
+  async incrementUsage(clerkUserId: string): Promise<void> {
+    // Get the Prisma user ID
+    const user = await prisma.user.findUnique({
+      where: { clerkId: clerkUserId },
+      select: { id: true },
+    })
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+
     await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const subscription = await tx.subscription.findUnique({
-        where: { userId },
+        where: { userId: user.id },
       })
 
       if (!subscription) {
@@ -81,7 +131,7 @@ export class RateLimitService {
       }
 
       await tx.subscription.update({
-        where: { userId },
+        where: { userId: user.id },
         data: {
           monthlyUsage: subscription.monthlyUsage + 1,
         },
