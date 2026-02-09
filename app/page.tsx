@@ -8,6 +8,11 @@ import { SignUpButton } from '@clerk/nextjs'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
+import { ParticleField } from '@/components/particle-field'
+import { AnimatedGradientMesh } from '@/components/animated-gradient-mesh'
+import { GlassmorphicCard } from '@/components/glassmorphic-card'
+import { AnimatedCounter } from '@/components/animated-counter'
+import { AnimatedConnectionLines } from '@/components/animated-connection-lines'
 
 export default function LandingPage() {
   const heroRef = useRef<HTMLDivElement>(null)
@@ -35,13 +40,50 @@ export default function LandingPage() {
       <Navigation />
       
       {/* Hero Section */}
-      <section ref={heroRef} className="relative overflow-hidden px-4 py-20 sm:py-32">
-        <div className="absolute inset-0 -z-10 opacity-40">
+      <section ref={heroRef} className="relative overflow-hidden px-4 py-20 sm:py-32 h-screen flex items-center">
+        {/* Enhanced background layers */}
+        <div className="absolute inset-0 -z-20">
+          <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-background" />
+          
+          {/* Particle Field */}
+          <motion.div
+            className="absolute inset-0 opacity-40"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.4 }}
+            transition={{ duration: 2 }}
+          >
+            <ParticleField count={250} speed={0.3} color1="#06b6d4" color2="#a855f7" />
+          </motion.div>
+        </div>
+
+        <div className="absolute inset-0 -z-10">
+          {/* Animated gradient mesh */}
+          <AnimatedGradientMesh />
+          
+          {/* Orbital particle rings */}
           <motion.div 
-            className="absolute top-20 right-0 w-80 h-80 bg-accent rounded-full mix-blend-multiply filter blur-3xl"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-cyan-500/20 rounded-full"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-purple-500/20 rounded-full"
+            animate={{ rotate: -360 }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-cyan-500/30 rounded-full"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          />
+          
+          {/* Morphing blobs */}
+          <motion.div 
+            className="absolute top-20 right-0 w-80 h-80 bg-cyan-500/20 rounded-full mix-blend-multiply filter blur-3xl"
             animate={{
               scale: [1, 1.2, 1],
               opacity: [0.4, 0.6, 0.4],
+              borderRadius: ["30%", "70%", "30%"]
             }}
             transition={{
               duration: 8,
@@ -50,10 +92,11 @@ export default function LandingPage() {
             }}
           />
           <motion.div 
-            className="absolute -bottom-20 left-20 w-80 h-80 bg-accent/50 rounded-full mix-blend-multiply filter blur-3xl"
+            className="absolute -bottom-20 left-20 w-80 h-80 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-3xl"
             animate={{
               scale: [1, 1.3, 1],
               opacity: [0.3, 0.5, 0.3],
+              borderRadius: ["70%", "30%", "70%"]
             }}
             transition={{
               duration: 10,
@@ -62,9 +105,10 @@ export default function LandingPage() {
               delay: 1
             }}
           />
+          
           {/* Mouse tracking glow effect */}
           <motion.div 
-            className="absolute w-96 h-96 bg-accent/30 rounded-full mix-blend-screen filter blur-2xl pointer-events-none"
+            className="absolute w-96 h-96 bg-gradient-to-r from-cyan-500/30 to-purple-500/30 rounded-full mix-blend-screen filter blur-2xl pointer-events-none"
             animate={{
               x: mousePosition.x - 192,
               y: mousePosition.y - 192,
@@ -77,7 +121,7 @@ export default function LandingPage() {
           />
         </div>
 
-        <div className="mx-auto max-w-4xl text-center">
+        <div className="mx-auto max-w-4xl text-center relative z-10">
           <motion.div 
             className="mb-6 inline-block"
             initial={{ opacity: 0, y: -20, scale: 0.8 }}
@@ -86,30 +130,31 @@ export default function LandingPage() {
             whileHover={{ scale: 1.05, y: -5 }}
           >
             <motion.span 
-              className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-2 text-sm font-medium text-accent border border-accent/20"
+              className="inline-flex items-center gap-2 rounded-full bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-400 border border-cyan-500/30 backdrop-blur-sm"
               animate={{ 
                 boxShadow: [
-                  "0 0 0px rgba(var(--accent), 0)",
-                  "0 0 20px rgba(var(--accent), 0.5)",
-                  "0 0 0px rgba(var(--accent), 0)"
+                  "0 0 0px rgba(6, 182, 212, 0)",
+                  "0 0 20px rgba(6, 182, 212, 0.5)",
+                  "0 0 0px rgba(6, 182, 212, 0)"
                 ]
               }}
               transition={{ duration: 3, repeat: Infinity }}
             >
               <Sparkles className="w-4 h-4" />
-              AI-Powered Outreach
+              ✨ AI-Powered Outreach
             </motion.span>
           </motion.div>
 
+          {/* Main heading with staggered letter reveal */}
           <motion.h1 
-            className="text-5xl sm:text-7xl font-bold tracking-tight mb-6 text-balance"
+            className="text-6xl sm:text-7xl lg:text-8xl font-bold tracking-tight mb-6 text-balance leading-tight"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
             Transform URLs into{' '}
             <motion.span 
-              className="text-accent inline-block"
+              className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-cyan-400"
               animate={{ 
                 backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
               }}
@@ -121,14 +166,14 @@ export default function LandingPage() {
           </motion.h1>
 
           <motion.p 
-            className="text-xl text-foreground/60 mb-8 max-w-2xl mx-auto text-balance"
+            className="text-xl text-foreground/70 mb-8 max-w-2xl mx-auto text-balance leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             Our intelligent agent{' '}
             <motion.span
-              className="font-semibold text-accent"
+              className="font-semibold text-cyan-400"
               animate={{ opacity: [1, 0.5, 1] }}
               transition={{ duration: 2, repeat: Infinity, delay: 0 }}
             >
@@ -143,16 +188,16 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <motion.div whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(6, 182, 212, 0.5)" }} whileTap={{ scale: 0.95 }}>
               <SignUpButton mode="redirect">
-                <Button size="lg" className="bg-accent hover:bg-accent/90 text-white gap-2 h-12 px-8 text-base">
+                <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white gap-2 h-12 px-8 text-base font-semibold shadow-lg hover:shadow-xl transition-all">
                   Try Demo <ArrowRight className="w-4 h-4" />
                 </Button>
               </SignUpButton>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link href="#features">
-                <Button size="lg" variant="outline" className="gap-2 h-12 px-8 text-base bg-transparent">
+                <Button size="lg" variant="outline" className="gap-2 h-12 px-8 text-base bg-white/10 border-white/20 hover:bg-white/20 backdrop-blur-sm">
                   View Features
                 </Button>
               </Link>
@@ -160,31 +205,35 @@ export default function LandingPage() {
           </motion.div>
 
           <motion.div 
-            className="grid grid-cols-3 gap-6 max-w-2xl mx-auto pt-8 border-t border-border/50"
+            className="grid grid-cols-3 gap-6 max-w-2xl mx-auto pt-8 border-t border-white/10"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             {[
-              { value: '30s', label: 'Complete Analysis' },
-              { value: '99%', label: 'Personalization Rate' },
-              { value: '∞', label: 'Research Saved' }
+              { value: 30, label: 's', description: 'Complete Analysis' },
+              { value: 99, label: '%', description: 'Personalization Rate' },
+              { value: '∞', label: '', description: 'Research Saved' }
             ].map((stat, idx) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5 + idx * 0.1 }}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.1, y: -5 }}
               >
                 <motion.div 
-                  className="text-2xl font-bold text-accent"
+                  className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent"
                   animate={{ y: [0, -5, 0] }}
                   transition={{ duration: 3, repeat: Infinity, delay: idx * 0.2 }}
                 >
-                  {stat.value}
+                  {typeof stat.value === 'number' ? (
+                    <AnimatedCounter to={stat.value} duration={2} suffix={stat.label} delay={0.5 + idx * 0.1} />
+                  ) : (
+                    stat.value
+                  )}
                 </motion.div>
-                <p className="text-sm text-foreground/60">{stat.label}</p>
+                <p className="text-sm text-foreground/60 mt-2">{stat.description}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -192,8 +241,27 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="px-4 py-20 sm:py-32 bg-secondary/30">
-        <div className="mx-auto max-w-6xl">
+      <section id="features" className="relative px-4 py-20 sm:py-32 bg-gradient-to-b from-background to-purple-950/10">
+        {/* Animated background grid */}
+        <div className="absolute inset-0 -z-10 opacity-20">
+          <motion.div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: 'linear-gradient(0deg, transparent 24%, rgba(6, 182, 212, 0.1) 25%, rgba(6, 182, 212, 0.1) 26%, transparent 27%, transparent 74%, rgba(6, 182, 212, 0.1) 75%, rgba(6, 182, 212, 0.1) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(6, 182, 212, 0.1) 25%, rgba(6, 182, 212, 0.1) 26%, transparent 27%, transparent 74%, rgba(6, 182, 212, 0.1) 75%, rgba(6, 182, 212, 0.1) 76%, transparent 77%, transparent)',
+              backgroundSize: '50px 50px',
+            }}
+            animate={{
+              backgroundPosition: ['0 0', '50px 50px'],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+          />
+        </div>
+
+        <div className="mx-auto max-w-6xl relative z-10">
           <motion.div 
             className="text-center mb-16"
             initial={{ opacity: 0, y: 20 }}
@@ -201,7 +269,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl sm:text-5xl font-bold mb-4">Powerful Features</h2>
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">Powerful Features</h2>
             <p className="text-lg text-foreground/60 max-w-2xl mx-auto">
               Everything you need to research companies and generate compelling outreach messages
             </p>
@@ -209,74 +277,46 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* Feature 1 */}
-            <motion.div 
-              className="bg-background rounded-lg border border-border p-8 hover:border-accent/50 transition-colors"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="mb-4 inline-flex p-3 bg-accent/10 rounded-lg">
-                <Zap className="w-6 h-6 text-accent" />
+            <GlassmorphicCard delay={0.1}>
+              <div className="mb-4 inline-flex p-3 bg-cyan-500/20 rounded-lg backdrop-blur-sm border border-cyan-500/30">
+                <Zap className="w-6 h-6 text-cyan-400" />
               </div>
               <h3 className="text-2xl font-bold mb-2">Lightning Fast</h3>
               <p className="text-foreground/60">Get complete company analysis and personalized emails in just 30 seconds. No waiting, no complexity.</p>
-            </motion.div>
+            </GlassmorphicCard>
 
             {/* Feature 2 */}
-            <motion.div 
-              className="bg-background rounded-lg border border-border p-8 hover:border-accent/50 transition-colors"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="mb-4 inline-flex p-3 bg-accent/10 rounded-lg">
-                <Target className="w-6 h-6 text-accent" />
+            <GlassmorphicCard delay={0.2}>
+              <div className="mb-4 inline-flex p-3 bg-purple-500/20 rounded-lg backdrop-blur-sm border border-purple-500/30">
+                <Target className="w-6 h-6 text-purple-400" />
               </div>
               <h3 className="text-2xl font-bold mb-2">Hyper-Personalized</h3>
               <p className="text-foreground/60">Analyzes recent news, LinkedIn updates, and company data to create truly unique outreach messages.</p>
-            </motion.div>
+            </GlassmorphicCard>
 
             {/* Feature 3 */}
-            <motion.div 
-              className="bg-background rounded-lg border border-border p-8 hover:border-accent/50 transition-colors"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="mb-4 inline-flex p-3 bg-accent/10 rounded-lg">
-                <Mail className="w-6 h-6 text-accent" />
+            <GlassmorphicCard delay={0.3}>
+              <div className="mb-4 inline-flex p-3 bg-cyan-500/20 rounded-lg backdrop-blur-sm border border-cyan-500/30">
+                <Mail className="w-6 h-6 text-cyan-400" />
               </div>
               <h3 className="text-2xl font-bold mb-2">Research Dashboard</h3>
               <p className="text-foreground/60">Access your entire research history, save favorites, organize with tags, and track your outreach progress.</p>
-            </motion.div>
+            </GlassmorphicCard>
 
             {/* Feature 4 */}
-            <motion.div 
-              className="bg-background rounded-lg border border-border p-8 hover:border-accent/50 transition-colors"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="mb-4 inline-flex p-3 bg-accent/10 rounded-lg">
-                <Sparkles className="w-6 h-6 text-accent" />
+            <GlassmorphicCard delay={0.4}>
+              <div className="mb-4 inline-flex p-3 bg-purple-500/20 rounded-lg backdrop-blur-sm border border-purple-500/30">
+                <Sparkles className="w-6 h-6 text-purple-400" />
               </div>
               <h3 className="text-2xl font-bold mb-2">AI-Powered Analysis</h3>
               <p className="text-foreground/60">Advanced AI scrapes websites, searches news, analyzes company data, and identifies key talking points.</p>
-            </motion.div>
+            </GlassmorphicCard>
           </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section className="px-4 py-20 sm:py-32">
+      <section className="relative px-4 py-20 sm:py-32">
         <div className="mx-auto max-w-6xl">
           <motion.div 
             className="text-center mb-16"
@@ -285,11 +325,16 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl sm:text-5xl font-bold mb-4">How It Works</h2>
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">How It Works</h2>
             <p className="text-lg text-foreground/60">Three simple steps to outreach success</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="relative grid md:grid-cols-3 gap-8">
+            {/* Animated connection lines */}
+            <div className="hidden md:block absolute top-0 left-0 w-full h-32">
+              <AnimatedConnectionLines stepCount={3} />
+            </div>
+
             {[
               {
                 step: '1',
@@ -309,24 +354,31 @@ export default function LandingPage() {
             ].map((item, idx) => (
               <motion.div 
                 key={item.step} 
-                className="relative"
+                className="relative pt-16"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
               >
-                <div className="text-6xl font-bold text-accent/20 mb-4">{item.step}</div>
-                <h3 className="text-2xl font-bold mb-3">{item.title}</h3>
-                <p className="text-foreground/60">{item.description}</p>
-                {item.step !== '3' && (
-                  <motion.div 
-                    className="hidden md:block absolute top-8 -right-4 text-2xl text-accent/40"
-                    animate={{ x: [0, 5, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  >
-                    <ArrowRight className="w-8 h-8" />
-                  </motion.div>
-                )}
+                {/* Step number with glow */}
+                <motion.div
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500/30 to-purple-500/30 flex items-center justify-center"
+                  animate={{
+                    boxShadow: [
+                      '0 0 0px rgba(6, 182, 212, 0)',
+                      '0 0 30px rgba(6, 182, 212, 0.5)',
+                      '0 0 0px rgba(6, 182, 212, 0)',
+                    ]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">{item.step}</span>
+                </motion.div>
+                
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold mb-3">{item.title}</h3>
+                  <p className="text-foreground/60">{item.description}</p>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -334,7 +386,7 @@ export default function LandingPage() {
       </section>
 
       {/* Use Cases Section */}
-      <section className="px-4 py-20 sm:py-32 bg-secondary/30">
+      <section className="relative px-4 py-20 sm:py-32 bg-gradient-to-b from-purple-950/20 to-background">
         <div className="mx-auto max-w-6xl">
           <motion.div 
             className="text-center mb-16"
@@ -343,7 +395,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl sm:text-5xl font-bold mb-4">Who It's For</h2>
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">Who It's For</h2>
             <p className="text-lg text-foreground/60">Perfect for any professional doing targeted outreach</p>
           </motion.div>
 
@@ -372,24 +424,19 @@ export default function LandingPage() {
             ].map((item, idx) => {
               const Icon = item.icon
               return (
-                <motion.div 
-                  key={idx} 
-                  className="flex gap-4"
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: idx * 0.1 }}
-                >
-                  <div className="flex-shrink-0">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
-                      <Icon className="h-6 w-6 text-accent" />
+                <GlassmorphicCard key={idx} delay={idx * 0.1} index={idx} className="rounded-lg">
+                  <div className="flex gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/30">
+                        <Icon className="h-6 w-6 text-cyan-400" />
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                      <p className="text-foreground/60">{item.description}</p>
                     </div>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                    <p className="text-foreground/60">{item.description}</p>
-                  </div>
-                </motion.div>
+                </GlassmorphicCard>
               )
             })}
           </div>
@@ -397,7 +444,7 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section className="px-4 py-20 sm:py-32">
+      <section className="relative px-4 py-20 sm:py-32">
         <div className="mx-auto max-w-6xl">
           <motion.div 
             className="text-center mb-16"
@@ -406,7 +453,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl sm:text-5xl font-bold mb-4">Simple Pricing</h2>
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">Simple Pricing</h2>
             <p className="text-lg text-foreground/60">Start free, upgrade when you're ready</p>
           </motion.div>
 
@@ -438,52 +485,93 @@ export default function LandingPage() {
                 featured: false
               }
             ].map((plan, idx) => (
-              <motion.div 
-                key={idx} 
-                className={`rounded-lg border p-8 transition-all ${
-                  plan.featured 
-                    ? 'border-accent bg-accent/5 ring-1 ring-accent scale-105' 
-                    : 'border-border bg-background'
-                }`}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                whileHover={{ scale: plan.featured ? 1.05 : 1.02 }}
-              >
-                {plan.featured && (
-                  <div className="mb-4 inline-block">
-                    <span className="text-xs font-bold text-accent uppercase tracking-wider">Most Popular</span>
+              <GlassmorphicCard key={idx} delay={idx * 0.1} index={idx} className="rounded-lg flex flex-col">
+                <div className="flex-1">
+                  {plan.featured && (
+                    <motion.div 
+                      className="mb-4 inline-block px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500/30 to-purple-500/30 border border-cyan-500/30"
+                      animate={{
+                        boxShadow: [
+                          '0 0 0px rgba(6, 182, 212, 0)',
+                          '0 0 20px rgba(6, 182, 212, 0.3)',
+                          '0 0 0px rgba(6, 182, 212, 0)',
+                        ]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">✨ Most Popular</span>
+                    </motion.div>
+                  )}
+                  <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">{plan.price}</span>
+                    {plan.period && <span className="text-foreground/60">{plan.period}</span>}
                   </div>
-                )}
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <div className="mb-4">
-                  <span className="text-4xl font-bold">{plan.price}</span>
-                  {plan.period && <span className="text-foreground/60">{plan.period}</span>}
+                  <p className="text-foreground/60 mb-6">{plan.description}</p>
+                  
+                  <div className="space-y-3">
+                    {plan.features.map((feature, fidx) => (
+                      <motion.div 
+                        key={fidx} 
+                        className="flex items-center gap-3"
+                        initial={{ opacity: 0, x: -10 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: fidx * 0.05 }}
+                      >
+                        <motion.div 
+                          className="text-cyan-400"
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 2, repeat: Infinity, delay: fidx * 0.1 }}
+                        >
+                          <Check className="w-4 h-4" />
+                        </motion.div>
+                        <span className="text-sm">{feature}</span>
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
-                <p className="text-foreground/60 mb-6">{plan.description}</p>
-                <Button 
-                  className={`w-full mb-6 ${plan.featured ? 'bg-accent hover:bg-accent/90' : 'bg-primary hover:bg-primary/90'}`}
+
+                <motion.div
+                  className="mt-8"
+                  whileHover={{ scale: 1.05 }}
                 >
-                  {plan.cta}
-                </Button>
-                <div className="space-y-3">
-                  {plan.features.map((feature, fidx) => (
-                    <div key={fidx} className="flex items-center gap-3">
-                      <Check className="w-4 h-4 text-accent" />
-                      <span className="text-sm">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
+                  <Button 
+                    className={`w-full font-semibold transition-all ${
+                      plan.featured 
+                        ? 'bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white shadow-lg' 
+                        : 'bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm'
+                    }`}
+                  >
+                    {plan.cta}
+                  </Button>
+                </motion.div>
+              </GlassmorphicCard>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="px-4 py-20 sm:py-32 bg-accent text-white">
-        <div className="mx-auto max-w-3xl text-center">
+      <section className="relative px-4 py-20 sm:py-32 bg-gradient-to-r from-cyan-600 to-purple-600 text-white overflow-hidden">
+        {/* Animated background particles */}
+        <motion.div
+          className="absolute inset-0 opacity-30"
+          animate={{
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
+            backgroundSize: '50px 50px',
+          }}
+        />
+
+        <div className="mx-auto max-w-3xl text-center relative z-10">
           <motion.h2 
             className="text-4xl sm:text-5xl font-bold mb-6"
             initial={{ opacity: 0, y: 20 }}
@@ -509,16 +597,20 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <SignUpButton mode="redirect">
-              <Button size="lg" className="bg-white text-accent hover:bg-white/90 gap-2">
-                Start Free <ArrowRight className="w-4 h-4" />
-              </Button>
-            </SignUpButton>
-            <Link href="#features">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 gap-2 bg-transparent">
-                View Demo
-              </Button>
-            </Link>
+            <motion.div whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(255,255,255,0.3)' }} whileTap={{ scale: 0.95 }}>
+              <SignUpButton mode="redirect">
+                <Button size="lg" className="bg-white text-cyan-600 hover:bg-white/90 gap-2 font-semibold shadow-lg">
+                  Start Free <ArrowRight className="w-4 h-4" />
+                </Button>
+              </SignUpButton>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link href="#features">
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 gap-2 bg-white/5 font-semibold backdrop-blur-sm">
+                  View Demo
+                </Button>
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
       </section>
