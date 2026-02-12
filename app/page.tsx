@@ -8,8 +8,6 @@ import { SignUpButton } from '@clerk/nextjs'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
-import { ParticleField } from '@/components/particle-field'
-import { AnimatedGradientMesh } from '@/components/animated-gradient-mesh'
 import { GlassmorphicCard } from '@/components/glassmorphic-card'
 import { AnimatedCounter } from '@/components/animated-counter'
 import { AnimatedConnectionLines } from '@/components/animated-connection-lines'
@@ -44,21 +42,9 @@ export default function LandingPage() {
         {/* Enhanced background layers */}
         <div className="absolute inset-0 -z-20">
           <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-background" />
-          
-          {/* Particle Field */}
-          <motion.div
-            className="absolute inset-0 opacity-40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.4 }}
-            transition={{ duration: 2 }}
-          >
-            <ParticleField count={250} speed={0.3} color1="#06b6d4" color2="#a855f7" />
-          </motion.div>
         </div>
 
         <div className="absolute inset-0 -z-10">
-          {/* Animated gradient mesh */}
-          <AnimatedGradientMesh />
           
           {/* Orbital particle rings */}
           <motion.div 
